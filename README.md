@@ -1,3 +1,4 @@
-# FTC Team Code (12525)
+# FTC Skystone Practice Repo
 
-No documentation whatsoever. Enjoy.
+Code in this repository is used on the old competition robot from the Skystone season for practice purposes.
+
