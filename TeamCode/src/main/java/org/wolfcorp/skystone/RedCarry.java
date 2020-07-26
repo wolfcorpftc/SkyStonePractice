@@ -1,47 +1,12 @@
 package org.wolfcorp.skystone;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 
 @Autonomous(name="Red 1 Skystone and Foundation", group="Auto")
 public class RedCarry extends SkystoneCarry {
-
     @Override
     public void runOpMode() {
-        robot.init(hardwareMap);
-
-        robot.setDriveRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.setDriveRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
-            initTFOD();
-
-            /* Activate TensorFlow Object Detection before we wait for the start command.
-             * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-             */
-            if (tfod != null) {
-                tfod.activate();
-            }
-        } else {
-            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
-            initVuforia();
-        }
-
-
-        telemetry.addData("Mode", "calibrating...");
-        telemetry.update();
-
-        while (opModeIsActive() && !robot.imu.isGyroCalibrated()) {
-            sleep(50);
-            idle();
-        }
-
-        telemetry.addData("Mode", "Done Calibrating");
-        telemetry.update();
-
-        waitForStart();
+        prologue();
         resetAngle();
         timer.reset();
         while (timer.milliseconds() < 2000 && opModeIsActive()) {
@@ -60,11 +25,11 @@ public class RedCarry extends SkystoneCarry {
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);
 
-        if (direction == "Right") {
+        if (direction.equals("Right")) {
             // default direction, do nothing
-        } else if (direction == "Left") {
+        } else if (direction.equals("Left")) {
             encoderDrive(0.7, -12, 12, 12, -12, 5);
-        } else if (direction == "None") {
+        } else if (direction.equals("None")) {
             encoderDrive(0.7, 8, -8, -8, 8, 5);
         }
 

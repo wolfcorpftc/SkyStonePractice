@@ -30,7 +30,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            // DRIVETRAIN
+            // Drivetrain
             if(gamepad1.y) {
                 robot.setDrivePower(0.15);
             } else if(gamepad1.a && !gamepad1.start){
@@ -41,7 +41,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                         gamepad1.left_stick_x * .9);
             }
 
-            // DRIVETRAIN SPEEDS
+            // Drivetrain speeds
             if (gamepad1.left_bumper && gamepad1.right_bumper) {
                 slowDown = 1;
             } else if (gamepad1.left_bumper) {
@@ -52,7 +52,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                 slowDown = 0.85;
             }
 
-            // LIFT SPOOLS
+            // Lift spools
             if (gamepad2.right_stick_button) {
                 spoolFast = 1;
             } else {
@@ -67,7 +67,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                 robot.lift.setPower(0);
             }
 
-            // CLAW TURN
+            // Claw turn
             if (gamepad2.left_stick_x > 0) {
                 robot.twist.setPosition(robot.twist.getPosition() - 0.008);
                 if (robot.twist.getPosition() < 0) {
@@ -80,7 +80,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                 }
             }
 
-            // CLAW SNAP IN
+            // Claw snap in
             if (gamepad2.left_stick_button) {
                 double[] positions = {0, 0.9};
                 double closest = 0;
@@ -94,7 +94,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                 robot.twist.setPosition(closest);
             }
 
-            // CLAW OPEN
+            // Claw open
             if (gamepad2.x) {
                 robot.open.setPosition(1);
             } else if (gamepad2.b && !gamepad2.start) {

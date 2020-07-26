@@ -1,8 +1,6 @@
 package org.wolfcorp.skystone;
 
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name="Blue Foundation No Park", group="Auto")
 public class BlueFoundation extends SkystoneAuto {
@@ -10,37 +8,9 @@ public class BlueFoundation extends SkystoneAuto {
     public void runOpMode() {
         int delay = (int) (Incrementor.delay*1000);
         sleep(delay);
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
-        telemetry.update();
-        //Necessary stuff
+        prologue();
 
-        robot.leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0",  "Starting at %7d :%7d",
-                robot.leftFront.getCurrentPosition(),
-                robot.rightFront.getCurrentPosition(),
-                robot.leftFront.getCurrentPosition(),
-                robot.rightFront.getCurrentPosition());
-        telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
         timer.reset();
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);

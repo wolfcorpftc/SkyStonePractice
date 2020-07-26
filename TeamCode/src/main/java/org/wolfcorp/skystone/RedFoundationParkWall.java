@@ -1,10 +1,6 @@
 package org.wolfcorp.skystone;
 
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="Red Foundation Park Wall", group="Auto")
 public class RedFoundationParkWall extends SkystoneAuto {
@@ -12,26 +8,8 @@ public class RedFoundationParkWall extends SkystoneAuto {
     public void runOpMode() {
         int delay = (int) (Incrementor.delay * 1000);
         sleep(delay);
+        prologue();
 
-        robot.init(hardwareMap);
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
-        telemetry.update();
-
-        // Reset encoder and set mode
-        robot.setDriveRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.setDriveRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0", "Starting at %7d :%7d",
-                robot.leftFront.getCurrentPosition(),
-                robot.rightFront.getCurrentPosition(),
-                robot.leftFront.getCurrentPosition(),
-                robot.rightFront.getCurrentPosition());
-        telemetry.update();
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
         timer.reset();
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);

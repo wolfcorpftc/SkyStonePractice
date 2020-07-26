@@ -34,6 +34,38 @@ public abstract class SkystoneCarry extends SkystoneAuto {
     protected VuforiaLocalizer vuforia;
     protected TFObjectDetector tfod;
 
+
+    @Override
+    protected void prologue() {
+        robot.init(hardwareMap);
+        robot.setDriveRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.setDriveRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTFOD();
+
+            /* Activate TensorFlow Object Detection before we wait for the start command.
+             * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+             */
+            if (tfod != null) {
+                tfod.activate();
+            }
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+            initVuforia();
+        }
+
+        telemetry.addData("Mode", "calibrating...");
+        telemetry.update();
+
+        while (opModeIsActive() && !robot.imu.isGyroCalibrated());
+
+        telemetry.addData("Mode", "Done Calibrating");
+        telemetry.update();
+
+        waitForStart();
+    }
+
     //all four encoders drive procedure
     protected void resetAngle() {
         lastAngles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);

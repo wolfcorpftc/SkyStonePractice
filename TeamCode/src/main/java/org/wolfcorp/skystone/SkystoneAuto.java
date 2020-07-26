@@ -3,6 +3,31 @@ package org.wolfcorp.skystone;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 public abstract class SkystoneAuto extends SkystoneOpMode {
+    /** Initialize hardware and wait for start */
+    protected void prologue() {
+        /*
+         * Initialize the drive system variables.
+         * The init() method of the hardware class does all the work here
+         */
+        robot.init(hardwareMap);
+
+        // Send telemetry message to signify robot waiting;
+        telemetry.addData("Status", "Resetting Encoders");    //
+        telemetry.update();
+
+        robot.setDriveRunMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.setDriveRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Send telemetry message to indicate successful Encoder reset
+        telemetry.addData("Path0", "Starting at %7d :%7d",
+                robot.leftFront.getCurrentPosition(),
+                robot.rightFront.getCurrentPosition(),
+                robot.leftFront.getCurrentPosition(),
+                robot.rightFront.getCurrentPosition());
+        telemetry.update();
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+    }
     /*
      *  Method to perfmorm a relative move, based on encoder counts.
      *  Encoders are not reset as the move is based on the current position.
