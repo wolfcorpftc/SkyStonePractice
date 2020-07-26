@@ -1,46 +1,45 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="Red Foundation Park Wall", group="Auto")
-public class RedFoundationParkWall extends SkystoneAuto {
+@Autonomous(name="Red Foundation No Park", group="Auto")
+public class RedFoundation extends SkystoneAuto {
+
     @Override
     public void runOpMode() {
-        int delay = (int) (Incrementor.delay * 1000);
+        int delay = (int) (Incrementor.delay*1000);
         sleep(delay);
         prologue();
-
         timer.reset();
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);
         robot.open.setPosition(1);
 
-        turnRight(1, 5);
-        forward(1, 30);
+        turnRight(1,5);
+        forward(1,30);
         robot.lift.setPower(1);
         forward(0.25, 5);
         robot.lift.setPower(0.3);
 
         robot.leftServo.setPosition(1);
         robot.rightServo.setPosition(0);
-        sleep(1000);
 
+        sleep(1000);
         robot.lift.setPower(0);
-        backward(0.25, 28);
-        turnRight(0.25, 13);
+        backward(0.25,28);
+        turnRight(0.25,13);
         forward(1, 15);
         robot.lift.setPower(-0.4);
         sleep(1000);
-        forward(1, 5);
+        forward(1,5);
         robot.lift.setPower(0);
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);
-        sidestepLeft(1, 15);
 
-        int time = (int) timer.milliseconds();
-        sleep(26000 - time);
+        //int time = (int) timer.milliseconds();
+        //sleep(26000 - time);
 
-        backward(1, 33);
+        backward(1, 2);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();

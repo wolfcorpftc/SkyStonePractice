@@ -1,4 +1,4 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.base;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class SkyStonePushbot
+public class SkyStoneRobot
 {
     /* Public OpMode members. */
     public DcMotor  leftFront   = null;
@@ -29,7 +29,7 @@ public class SkyStonePushbot
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
-    public SkyStonePushbot() {}
+    public SkyStoneRobot() {}
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
@@ -74,17 +74,58 @@ public class SkyStonePushbot
     }
 
     public void setDrivePower(double power) {
-        leftFront.setPower(power);
-        rightFront.setPower(power);
-        leftBack.setPower(power);
-        rightBack.setPower(power);
+        setDrivePower(power, power, power, power);
+    }
+    public void setDrivePower(double leftPower, double rightPower) {
+        setDrivePower(leftPower, rightPower, leftPower, rightPower);
+    }
+    public void setDrivePower(double leftPower, double rightPower,
+                              double leftBackPower, double rightBackPower) {
+        leftFront.setPower(leftPower);
+        rightFront.setPower(rightPower);
+        leftBack.setPower(leftBackPower);
+        rightBack.setPower(rightBackPower);
     }
 
-    void setDriveRunMode(DcMotor.RunMode runMode) {
+    public void setDriveTargetPos(int leftPos, int rightPos,
+                                  int leftBackPos, int rightBackPos) {
+        leftFront.setTargetPosition(leftPos);
+        rightFront.setTargetPosition(rightPos);
+        leftBack.setTargetPosition(leftBackPos);
+        rightBack.setTargetPosition(rightBackPos);
+    }
+    public void setDriveRunMode(DcMotor.RunMode runMode) {
         leftFront.setMode(runMode);
         rightFront.setMode(runMode);
         leftBack.setMode(runMode);
         rightBack.setMode(runMode);
     }
 
+    public void gripperUp() {
+        leftServo.setPosition(0);
+        rightServo.setPosition(1);
+    }
+    public void gripperDown() {
+        leftServo.setPosition(1);
+        rightServo.setPosition(0);
+    }
+
+    public void snapClaw() {
+        double[] positions = {0, 0.9};
+        double closest = 0;
+        double distance = 1;
+        for (double position : positions) {
+            if (Math.abs(twist.getPosition() - position) < distance) {
+                distance = Math.abs(twist.getPosition() - position);
+                closest = position;
+            }
+        }
+        twist.setPosition(closest);
+    }
+    public void openClaw() {
+        open.setPosition(1);
+    }
+    public void closeClaw() {
+        open.setPosition(0);
+    }
 }

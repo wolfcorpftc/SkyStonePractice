@@ -1,21 +1,20 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.wolfcorp.skystone.base.SkyStoneRobot;
+import org.wolfcorp.skystone.base.SkystoneOpMode;
 
 @TeleOp(name="Skystone TeleOp", group="Pushbot")
 public class SkystoneTeleOp extends SkystoneOpMode {
 
     /* Declare OpMode members. */
-    SkyStonePushbot robot       = new SkyStonePushbot();   // Use a Pushbot's hardware
+    SkyStoneRobot robot       = new SkyStoneRobot();   // Use a Pushbot's hardware
     double slowDown = 1;
     double spoolFast = 0.5;
 
     @Override
     public void runOpMode() {
-
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
@@ -82,16 +81,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
 
             // Claw snap in
             if (gamepad2.left_stick_button) {
-                double[] positions = {0, 0.9};
-                double closest = 0;
-                double distance = 1;
-                for (double position : positions) {
-                    if (Math.abs(robot.twist.getPosition() - position) < distance) {
-                        distance = Math.abs(robot.twist.getPosition() - position);
-                        closest = position;
-                    }
-                }
-                robot.twist.setPosition(closest);
+                robot.snapClaw();
             }
 
             // Claw open
@@ -101,16 +91,14 @@ public class SkystoneTeleOp extends SkystoneOpMode {
                 robot.open.setPosition(0);
             }
 
-            // FOUNDATION GRIPPERS
+            // Foundation grippers
             if (gamepad1.dpad_up) {
-                robot.leftServo.setPosition(0);
-                robot.rightServo.setPosition(1);
+                robot.gripperUp();
             } else if (gamepad1.dpad_down) {
-                robot.leftServo.setPosition(1);
-                robot.rightServo.setPosition(0);
+                robot.gripperDown();
             }
 
-            // CAPSTONE DROP
+            // Capstone drop
             if (gamepad2.dpad_right) {
                 robot.capstone.setPosition(0.35);
             } else if (gamepad2.dpad_left) {
@@ -119,8 +107,7 @@ public class SkystoneTeleOp extends SkystoneOpMode {
         }
     }
 
-    public void mecanumDrive(double x, double y, double rotation)
-    {
+    public void mecanumDrive(double x, double y, double rotation) {
         double[] wheelSpeeds = new double[4];
 
         wheelSpeeds[0] = x + y + rotation;

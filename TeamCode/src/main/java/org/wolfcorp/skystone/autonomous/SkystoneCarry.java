@@ -1,4 +1,4 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.autonomous;
 
 import android.annotation.SuppressLint;
 
@@ -20,7 +20,6 @@ public abstract class SkystoneCarry extends SkystoneAuto {
     protected Orientation lastAngles = new Orientation();
 
     protected double globalAngle;
-    protected double power = .30;
     protected String direction = "None";
 
     protected ElapsedTime timer = new ElapsedTime();
@@ -33,7 +32,6 @@ public abstract class SkystoneCarry extends SkystoneAuto {
 
     protected VuforiaLocalizer vuforia;
     protected TFObjectDetector tfod;
-
 
     @Override
     protected void prologue() {
@@ -93,66 +91,16 @@ public abstract class SkystoneCarry extends SkystoneAuto {
         return globalAngle;
     }
 
-    //encoder drive procedure
-    public void encoderDrive(double speed, double leftInches, double rightInches, double timeoutS) {
-        int newLeftTarget;
-        int newRightTarget;
-        int newLeftTarget2;
-        int newRightTarget2;
-
-        if (opModeIsActive()) {
-
-            newLeftTarget = robot.leftFront.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            newRightTarget = robot.rightFront.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-            newLeftTarget2 = robot.leftBack.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-            newRightTarget2 = robot.rightBack.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-
-            robot.leftFront.setTargetPosition(newLeftTarget);
-            robot.rightFront.setTargetPosition(newRightTarget);
-            robot.leftBack.setTargetPosition(newLeftTarget2);
-            robot.rightBack.setTargetPosition(newRightTarget2);
-
-            robot.setDriveRunMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            timer.reset();
-            robot.setDrivePower(Math.abs(speed));
-
-            while (opModeIsActive() &&
-                    (timer.seconds() < timeoutS) &&
-                    (robot.leftFront.isBusy() && robot.rightFront.isBusy() && robot.leftBack.isBusy() && robot.rightBack.isBusy())) {
-
-
-                telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
-                telemetry.addData("LeftFront Current", robot.leftFront.getCurrentPosition());
-                telemetry.addData("RightFront Current", robot.rightFront.getCurrentPosition());
-                telemetry.addData("LeftBack Current", robot.leftBack.getCurrentPosition());
-                telemetry.addData("RightBack Current", robot.rightBack.getCurrentPosition());
-                telemetry.addData("Path2", "Running at %7d :%7d :%7d :%7d",
-                        robot.leftFront.getCurrentPosition(),
-                        robot.rightFront.getCurrentPosition(),
-                        robot.leftBack.getCurrentPosition(),
-                        robot.rightBack.getCurrentPosition());
-                telemetry.update();
-            }
-
-            robot.setDrivePower(0);
-            robot.setDriveRunMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-    }
-
-    protected double checkDirection() {
+    protected double getCorrection() {
         // The gain value determines how sensitive the correction is to direction changes.
         // You will have to experiment with your robot to get small smooth direction changes
         // to stay on a straight line.
-        double correction, angle, gain = .10;
+        double correction;
+        double angle = getAngle();
+        double gain = .10;
 
-        angle = getAngle();
-
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
-
+        if (angle == 0) correction = 0;             // no adjustment.
+        else correction = -angle;        // reverse sign of angle for correction.
         correction = correction * gain / 2;
 
         if (correction < 0.4 && correction > 0.1) {
@@ -170,42 +118,36 @@ public abstract class SkystoneCarry extends SkystoneAuto {
 
     //Turning position to original direction using gyro
     protected void resetPosition() {
-        double correction = checkDirection() / 2;
+        double correction = getCorrection() / 2;
 
         telemetry.addData("1 imu heading", lastAngles.firstAngle);
         telemetry.addData("2 global heading", globalAngle);
         telemetry.addData("3 correction", correction);
         telemetry.update();
 
-        robot.leftFront.setPower(0 - correction);
-        robot.leftBack.setPower(0 - correction);
-        robot.rightFront.setPower(0 + correction);
-        robot.rightBack.setPower(0 + correction);
+        robot.setDrivePower(0 - correction, 0 + correction);
     }
 
-    protected void rotate(int degrees, double power, int timeoutMS) {
+    protected void rotate(int degrees, double power, int timeoutMillis) {
         double leftPower, rightPower;
 
         // getAngle() returns + when rotating counter clockwise (left) and - when rotating
         // clockwise (right).
         timer.reset();
-        while(opModeIsActive() && timer.milliseconds()<timeoutMS) {
+        while (opModeIsActive() && timer.milliseconds() < timeoutMillis) {
             if (degrees < getAngle()) {
                 leftPower = Math.min(power, Math.abs(degrees - getAngle()) / 30);
-                rightPower = -Math.min(power, Math.abs(degrees - getAngle()) / 30);
+                rightPower = -leftPower;
             } else if (degrees > getAngle()) {
                 leftPower = -Math.min(power, Math.abs(degrees - getAngle()) / 30);
-                rightPower = Math.min(power, Math.abs(degrees - getAngle()) / 30);
+                rightPower = -leftPower;
             } else {
                 leftPower = 0;
                 rightPower = 0;
             }
 
             // set power to rotate.
-            robot.leftFront.setPower(leftPower);
-            robot.leftBack.setPower(leftPower);
-            robot.rightFront.setPower(rightPower);
-            robot.rightBack.setPower(rightPower);
+            robot.setDrivePower(leftPower, rightPower);
         }
 
         // turn the motors off.
@@ -240,7 +182,7 @@ public abstract class SkystoneCarry extends SkystoneAuto {
     }
 
     @SuppressLint("DefaultLocale")
-    protected void TFIdentify() {
+    protected void identifySkystone() {
         if (tfod != null) {
             // getUpdatedRecognitions() will return null if no new information is available since
             // the last time that call was made.

@@ -1,15 +1,15 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="Red Foundation No Park", group="Auto")
-public class RedFoundation extends SkystoneAuto {
-
+@Autonomous(name="Red Foundation Park Middle", group="Auto")
+public class RedFoundationParkMiddle extends SkystoneAuto {
     @Override
     public void runOpMode() {
         int delay = (int) (Incrementor.delay*1000);
         sleep(delay);
         prologue();
+
         timer.reset();
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);
@@ -35,11 +35,15 @@ public class RedFoundation extends SkystoneAuto {
         robot.lift.setPower(0);
         robot.leftServo.setPosition(0);
         robot.rightServo.setPosition(1);
+        //sidestepRight(1,4);
+        int time = (int) timer.milliseconds();
+        sleep(23000 - time);
 
-        //int time = (int) timer.milliseconds();
-        //sleep(26000 - time);
-
-        backward(1, 2);
+        backward(1, 5);
+        turnLeft(1,13);
+        forward(1, 12);
+        turnLeft(1,13);
+        forward(1,25);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();

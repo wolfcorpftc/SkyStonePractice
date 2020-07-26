@@ -1,6 +1,8 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.wolfcorp.skystone.base.SkystoneOpMode;
 
 @Autonomous(name="Incrementor", group="Misc")
 public class Incrementor extends SkystoneOpMode {

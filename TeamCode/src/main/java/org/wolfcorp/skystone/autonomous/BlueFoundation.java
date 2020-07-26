@@ -1,4 +1,4 @@
-package org.wolfcorp.skystone;
+package org.wolfcorp.skystone.autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
