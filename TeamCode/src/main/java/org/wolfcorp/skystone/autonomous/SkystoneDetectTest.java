@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.wolfcorp.skystone.vision.SkystoneDetector;
+import org.wolfcorp.skystone.vision.SkystoneOpenCVDetector;
 
 @Autonomous(name="Skystone Identification Practice", group="Auto")
 public class SkystoneDetectTest extends SkystoneDetectMode {
@@ -21,7 +21,7 @@ public class SkystoneDetectTest extends SkystoneDetectMode {
         // processFrame() will be called to process the frame
         phoneCam.setPipeline(detector);
         // Remember to change the camera rotation
-        phoneCam.startStreaming(width, height, OpenCvCameraRotation.SIDEWAYS_LEFT);
+        phoneCam.startStreaming(width, height, OpenCvCameraRotation.UPRIGHT);
     }
 
     @Override
@@ -30,7 +30,8 @@ public class SkystoneDetectTest extends SkystoneDetectMode {
         String output = "";
         waitForStart();
         while (opModeIsActive()) {
-            SkystoneDetector.SkystoneLocation location = detector.getLocation();
+            detector.resetStatistics();
+            SkystoneOpenCVDetector.SkystoneLocation location = detector.getLocation();
             switch (location) {
                 case LEFT:
                     output = "Left";
@@ -55,7 +56,7 @@ public class SkystoneDetectTest extends SkystoneDetectMode {
     protected void moveToNextPair() { }
 
     @Override
-    protected void transportSkystone(SkystoneDetector.SkystoneLocation location) {
+    protected void transportSkystone(SkystoneOpenCVDetector.SkystoneLocation location) {
         switch (location) {
             case LEFT:
                 sidestepLeft(0.5, 4);

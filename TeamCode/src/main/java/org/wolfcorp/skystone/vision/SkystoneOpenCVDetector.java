@@ -12,40 +12,28 @@ import org.openftc.easyopencv.OpenCvPipeline;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SkystoneDetector extends OpenCvPipeline {
+public class SkystoneOpenCVDetector extends OpenCvPipeline {
     public enum SkystoneLocation {
         LEFT,
         RIGHT,
         NONE
     }
 
-    private int width; // width of the image
+    long[] stats = new long[3];
+
     private SkystoneLocation location = SkystoneLocation.NONE;
     public boolean ran = false;
     public boolean empty = false;
-
-    /**
-     *
-     * @param width The width of the image (check your camera)
-     */
-    public SkystoneDetector(int width) {
-        this.width = width;
-    }
 
     @Override
     public Mat processFrame(Mat input) {
         ran = true;
         empty = false;
-        // "Mat" stands for matrix, which is basically the image that the detector will process
-        // the input matrix is the image coming from the camera
-        // the function will return a matrix to be drawn on your phone's screen
 
-        // The detector detects regular stones. The camera fits two stones.
-        // If it finds one regular stone then the other must be the skystone.
-        // If both are regular stones, it returns NONE to tell the robot to keep looking
 
         // Make a working copy of the input matrix in HSV
         Mat mat = new Mat();
+
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
         // if something is wrong, we assume there's no skystone
@@ -58,7 +46,7 @@ public class SkystoneDetector extends OpenCvPipeline {
         // We create a HSV range for yellow to detect regular stones
         // NOTE: In OpenCV's implementation,
         // Hue values are half the real value
-        Scalar lowHSV = new Scalar(20, 100, 100); // lower bound HSV for yellow
+        Scalar lowHSV = new Scalar(20, 100, 25); // lower bound HSV for yellow
         Scalar highHSV = new Scalar(30, 255, 255); // higher bound HSV for yellow
         Mat thresh = new Mat();
 
@@ -69,11 +57,10 @@ public class SkystoneDetector extends OpenCvPipeline {
         // Use Canny Edge Detection to find edges
         // you might have to tune the thresholds for hysteresis
         Mat edges = new Mat();
-        Imgproc.Canny(thresh, edges, 100, 300);
+        Imgproc.Canny(thresh, edges, 170, 300);
 
         // https://docs.opencv.org/3.4/da/d0c/tutorial_bounding_rects_circles.html
-        // Oftentimes the edges are disconnected. findContours connects these edges.
-        // We then find the bounding rectangles of those contours
+        // find contours the create bounding rectangles
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierarchy = new Mat();
         Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -87,37 +74,71 @@ public class SkystoneDetector extends OpenCvPipeline {
         }
 
         // Iterate and check whether the bounding boxes
-        // cover left and/or right side of the image
+        // cover left and/or right side of the image.
+        // The boxes are drawn into the result matrix
+        Mat result = input.clone();
+        int width = input.width();
         double left_x = 0.25 * width;
         double right_x = 0.75 * width;
         boolean left = false; // true if regular stone found on the left side
         boolean right = false; // "" "" on the right side
-        for (int i = 0; i != boundRect.length; i++) {
-            if (boundRect[i].x < left_x)
-                left = true;
-            if (boundRect[i].x + boundRect[i].width > right_x)
-                right = true;
+        for (Rect rect : boundRect) {
+            // Apply an area threshold first
+            if (rect.width * rect.height >= 2000) {
+                if (rect.x < left_x)
+                    left = true;
+                if (rect.x + rect.width > right_x)
+                    right = true;
 
-            // draw red bounding rectangles on mat
-            // the mat has been converted to HSV so we need to use HSV as well
-            Imgproc.rectangle(mat, boundRect[i], new Scalar(0.5, 76.9, 89.8));
+                // draw red bounding rectangles
+                Imgproc.rectangle(result, rect, new Scalar(211, 47, 47));
+            }
         }
 
         // if there is no yellow regions on a side
         // that side should be a Skystone
         if (!left) location = SkystoneLocation.LEFT;
         else if (!right) location = SkystoneLocation.RIGHT;
-        // if both are true, then there's no Skystone in front.
-        // since our team's camera can only detect two at a time
-        // we will need to scan the next 2 stones
         else location = SkystoneLocation.NONE;
 
-        return mat; // return the mat with rectangles drawn
+        // record statistics as the algorithm can become unstable
+        updateStatistics();
+        return result; // return the mat with rectangles drawn
     }
 
+    // get location based on statistics
     public SkystoneLocation getLocation() {
-        ran = false;
         empty = false;
-        return this.location;
+        int maxIdx = 0;
+        for (int i = 1; i != stats.length; i++) {
+            if (stats[maxIdx] > stats[i])
+                maxIdx = i;
+        }
+        switch (maxIdx) {
+            case 0: return SkystoneLocation.LEFT;
+            case 1: return SkystoneLocation.RIGHT;
+            default: return SkystoneLocation.NONE;
+        }
+    }
+
+    // set all stats elements to 0
+    public void resetStatistics() {
+        for (double i : stats) {
+            i = 0;
+        }
+    }
+
+    // increase stats count based on current location
+    private void updateStatistics() {
+        switch (location) {
+            case LEFT:
+                stats[0]++;
+                break;
+            case RIGHT:
+                stats[1]++;
+                break;
+            case NONE:
+                stats[2]++;
+        }
     }
 }
