@@ -20,7 +20,9 @@ public class SkystoneDetector extends OpenCvPipeline {
     }
 
     private int width; // width of the image
-    private SkystoneLocation location;
+    private SkystoneLocation location = SkystoneLocation.NONE;
+    public boolean ran = false;
+    public boolean empty = false;
 
     /**
      *
@@ -32,6 +34,8 @@ public class SkystoneDetector extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
+        ran = true;
+        empty = false;
         // "Mat" stands for matrix, which is basically the image that the detector will process
         // the input matrix is the image coming from the camera
         // the function will return a matrix to be drawn on your phone's screen
@@ -47,6 +51,7 @@ public class SkystoneDetector extends OpenCvPipeline {
         // if something is wrong, we assume there's no skystone
         if (mat.empty()) {
             location = SkystoneLocation.NONE;
+            empty = true;
             return input;
         }
 
@@ -111,6 +116,8 @@ public class SkystoneDetector extends OpenCvPipeline {
     }
 
     public SkystoneLocation getLocation() {
+        ran = false;
+        empty = false;
         return this.location;
     }
 }
