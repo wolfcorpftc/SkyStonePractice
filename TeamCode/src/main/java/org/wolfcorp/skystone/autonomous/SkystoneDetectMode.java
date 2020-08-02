@@ -6,6 +6,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
+import org.wolfcorp.skystone.vision.SkystoneDetectorBase;
 import org.wolfcorp.skystone.vision.SkystoneOpenCVDetector;
 
 @Autonomous(name="Auto: SkyStone Detector", group="Auto")
@@ -32,7 +33,7 @@ public abstract class SkystoneDetectMode extends SkystoneAuto {
         // Use the SkystoneDetector pipeline
         // processFrame() will be called to process the frame
         phoneCam.setPipeline(detector);
-        // Remember to change the camera rotation
+        // Change the camera rotation
         phoneCam.startStreaming(width, height, OpenCvCameraRotation.UPRIGHT);
         super.prologue(); // initialize hardware; wait for start
     }
@@ -42,21 +43,21 @@ public abstract class SkystoneDetectMode extends SkystoneAuto {
         prologue();
 
         // Start from the outermost pair
-        SkystoneOpenCVDetector.SkystoneLocation location = detector.getLocation();
-        if (location == SkystoneOpenCVDetector.SkystoneLocation.NONE) {
+        SkystoneDetectorBase.Location location = detector.getLocation();
+        if (location == SkystoneDetectorBase.Location.NONE) {
             // This means that the skystone must be
             // to the left of the current pair
             moveToNextPair();
             // The right one of the middle pair
-            transportSkystone(SkystoneOpenCVDetector.SkystoneLocation.RIGHT);
+            transportSkystone(SkystoneDetectorBase.Location.RIGHT);
             returnToNextPair();
             // The left one of the innermost pair
-            transportSkystone(SkystoneOpenCVDetector.SkystoneLocation.LEFT);
+            transportSkystone(SkystoneDetectorBase.Location.LEFT);
         } else {
-            SkystoneOpenCVDetector.SkystoneLocation opposite =
-                    location == SkystoneOpenCVDetector.SkystoneLocation.LEFT?
-                            SkystoneOpenCVDetector.SkystoneLocation.RIGHT:
-                            SkystoneOpenCVDetector.SkystoneLocation.LEFT;
+            SkystoneDetectorBase.Location opposite =
+                    location == SkystoneDetectorBase.Location.LEFT?
+                            SkystoneDetectorBase.Location.RIGHT:
+                            SkystoneDetectorBase.Location.LEFT;
             transportSkystone(location);
             returnToNextPair();
             moveToNextPair();
@@ -72,7 +73,7 @@ public abstract class SkystoneDetectMode extends SkystoneAuto {
     protected abstract void moveToNextPair();
 
     // grab the stone and transfer to foundation
-    protected abstract void transportSkystone(SkystoneOpenCVDetector.SkystoneLocation location);
+    protected abstract void transportSkystone(SkystoneDetectorBase.Location location);
 
     // moves to last pair and moveToNextPair()
     protected abstract void returnToNextPair();

@@ -7,21 +7,13 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SkystoneOpenCVDetector extends OpenCvPipeline {
-    public enum SkystoneLocation {
-        LEFT,
-        RIGHT,
-        NONE
-    }
-
+public class SkystoneOpenCVDetector extends SkystoneDetectorBase {
     long[] stats = new long[3];
 
-    private SkystoneLocation location = SkystoneLocation.NONE;
     public boolean ran = false;
     public boolean empty = false;
 
@@ -30,7 +22,6 @@ public class SkystoneOpenCVDetector extends OpenCvPipeline {
         ran = true;
         empty = false;
 
-
         // Make a working copy of the input matrix in HSV
         Mat mat = new Mat();
 
@@ -38,7 +29,7 @@ public class SkystoneOpenCVDetector extends OpenCvPipeline {
 
         // if something is wrong, we assume there's no skystone
         if (mat.empty()) {
-            location = SkystoneLocation.NONE;
+            location = Location.NONE;
             empty = true;
             return input;
         }
@@ -97,9 +88,9 @@ public class SkystoneOpenCVDetector extends OpenCvPipeline {
 
         // if there is no yellow regions on a side
         // that side should be a Skystone
-        if (!left) location = SkystoneLocation.LEFT;
-        else if (!right) location = SkystoneLocation.RIGHT;
-        else location = SkystoneLocation.NONE;
+        if (!left) location = Location.LEFT;
+        else if (!right) location = Location.RIGHT;
+        else location = Location.NONE;
 
         // record statistics as the algorithm can become unstable
         updateStatistics();
@@ -107,7 +98,8 @@ public class SkystoneOpenCVDetector extends OpenCvPipeline {
     }
 
     // get location based on statistics
-    public SkystoneLocation getLocation() {
+    @Override
+    public SkystoneDetectorBase.Location getLocation() {
         empty = false;
         int maxIdx = 0;
         for (int i = 1; i != stats.length; i++) {
@@ -115,9 +107,9 @@ public class SkystoneOpenCVDetector extends OpenCvPipeline {
                 maxIdx = i;
         }
         switch (maxIdx) {
-            case 0: return SkystoneLocation.LEFT;
-            case 1: return SkystoneLocation.RIGHT;
-            default: return SkystoneLocation.NONE;
+            case 0: return Location.LEFT;
+            case 1: return Location.RIGHT;
+            default: return Location.NONE;
         }
     }
 
