@@ -5,19 +5,34 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-// Hello, I am Zhenkai from FTC Team Wolf Corp 12525. In this video, we will set up EasyOpenCV for
-// FTC and detect Skystones from last season. EasyOpenCV is a library created by OpenFTC that allows
+// CHUNK 1 ====
+
+// Hello, I am Zhenkai from FTC Team Wolf Corp 12525.
+
+// switch to OpenFTC/EasyOpenCV tab
+
+// In this video, we will set up EasyOpenCV for
+// FTC and detect Skystones from last season. EasyOpenCV is a SDK created by OpenFTC that allows
 // FTC programmers use cameras with OpenCV easily.
+
+// switch to SDK tab
 
 // First you need to download the Skystone SDK from GitHub if you don't have it already. To set up
 // EasyOpenCV, we just have to follow the instructions on GitHub Open Android Studio.
 
-// In the `build.common.gradle` file, add `jcenter()` into the repository block then go to the
-// `build.gradle` file in the `TeamCode` module and add the following lines.
+// CHUNK 2 ====
 
-// Do a Gradle Sync to download the dependencies. Then we need to put the OpenCV library into
+// switch to android studio (make sure the project is closed)
+
+// let's open up the project in android studio
+
+// we need to add `jcenter()` into the repository block in the `build.common.gradle` file
+// now go to the `build.gradle` file in the `TeamCode` module and add the dependency
+
+// When you are done, do a Gradle Sync to download the dependencies.
+// Then we need to put the OpenCV library into
 // the `FIRST` folder on the robot controller's storage.
-// Enable MTP mode on your phone and drag and drop the `libOpenCvNative.so` file
+// Enable MTP mode on your phone and drag and drop the `libOpenCvNative.so` file into the FIRST folder
 
 // to identify SkyStones using OpenCV we have to create a pipeline.
 // A pipeline basically accepts video frame from the camera,
@@ -25,8 +40,10 @@ import org.opencv.imgproc.Imgproc;
 // and return an image to be shown on the robot controller's screen, assuming you are using a phone.
 // You can add annotations like rectangles before you return so you can see what the algorithm is doing.
 
+// CHUNK 3 ====
+
 // to get started, we create a class that inherits OpenCvPipeline,
-// so we need to define the processFrame() function
+// we need to define the processFrame() function
 public class SimpleSkystoneOpenCVDetector extends SkystoneDetectorBase {
     static final double PERCENT_COLOR_THRESHOLD = 0.3;
     @Override
@@ -48,15 +65,21 @@ public class SimpleSkystoneOpenCVDetector extends SkystoneDetectorBase {
         // anywhere other than on the stones.
 
         // For our team, our camera was constrained to the upright position, so it can only see two
-        // stones. Here we define an HSV range for yellow and do some thresholding.
+        // stones.
+        // We start by defining an HSV range
         Scalar lowHSV = new Scalar(26, 100, 100); // lower bound HSV for yellow
         Scalar highHSV = new Scalar(31, 255, 255); // higher bound HSV for yellow
-        // This happens to be a good HSV range to identify yellow
+        // This happens to be a good enough HSV range to identify yellow
 
+        // We apply thresholding to our image using the HSV range, which would show us the part
+        // of the image that is yellow
         // We create a new variable for the new thresholded matrix
         Mat thresh = new Mat();
+        // and do the actual thresholding
         Core.inRange(mat, lowHSV, highHSV, thresh);
         // Now, the regions in the HSV range will turn white, and the rest will be black.
+
+        // CHUNK 4 ====
 
         // Afterwards, we check to see what percentage of the matrix is white. Since white in HSV
         // always has a value of 255, we can determine the percentage by averaging the value
@@ -77,6 +100,8 @@ public class SimpleSkystoneOpenCVDetector extends SkystoneDetectorBase {
         int area = left.rows() * left.cols();
         double leftValue = Core.sumElems(left).val[2] / area / 255;
         double rightValue = Core.sumElems(right).val[2] / area / 255;
+
+        // CHUNK 5 ====
 
         // We should define some threshold for the percentages. If the percentage of yellow if lower
         // than some threshold, then it's a skystone. You want to tune the constant later.
