@@ -101,12 +101,11 @@ public class SimpleSkystoneOpenCVDetector extends SkystoneDetectorBase {
 
         // CHUNK 4 ====
 
-        // TODO: explain the ROI code and mention rectangle drawing
         // Since the robot always starts at the same position, we will know where the stones are on
         // the image. We focus on these regions instead of the whole image. Where these regions are
         // depends on the position of your camera, and you can determine them by drawing rectangles
         // on the image and adjust until the rectangles fits within where the stones are on the
-        // image.
+        // image, which I will demonstrate later.
 
         // I had already found the regions that my phone is going to use. We can define them as
         // Rectangles so we can reuse these coordinates without having to create multiple constants.
@@ -117,8 +116,6 @@ public class SimpleSkystoneOpenCVDetector extends SkystoneDetectorBase {
         // we can extract them from the image like so.
         Mat left = mat.submat(LEFT_ROI);
         Mat right = mat.submat(RIGHT_ROI);
-
-        // TODO: explain how grayscale image has only one channel, brightness
 
         // Now we check to see what percentage of the matrix became white to identify the
         // stones. We can determine the percentage by averaging the brightness, and dividing it by
