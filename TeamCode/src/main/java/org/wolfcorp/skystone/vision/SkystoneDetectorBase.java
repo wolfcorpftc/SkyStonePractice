@@ -6,9 +6,9 @@ public abstract class SkystoneDetectorBase extends OpenCvPipeline {
     public enum Location {
         LEFT,
         RIGHT,
-        NONE
+        NOT_FOUND
     }
 
-    protected Location location = Location.NONE;
+    protected Location location = Location.NOT_FOUND;
     public abstract Location getLocation();
 }

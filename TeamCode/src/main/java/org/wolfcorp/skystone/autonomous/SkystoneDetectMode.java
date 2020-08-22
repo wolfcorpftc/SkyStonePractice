@@ -44,7 +44,7 @@ public abstract class SkystoneDetectMode extends SkystoneAuto {
 
         // Start from the outermost pair
         SkystoneDetectorBase.Location location = detector.getLocation();
-        if (location == SkystoneDetectorBase.Location.NONE) {
+        if (location == SkystoneDetectorBase.Location.NOT_FOUND) {
             // This means that the skystone must be
             // to the left of the current pair
             moveToNextPair();

@@ -29,7 +29,7 @@ public class SkystoneOpenCVDetector extends SkystoneDetectorBase {
 
         // if something is wrong, we assume there's no skystone
         if (mat.empty()) {
-            location = Location.NONE;
+            location = Location.NOT_FOUND;
             empty = true;
             return input;
         }
@@ -90,7 +90,7 @@ public class SkystoneOpenCVDetector extends SkystoneDetectorBase {
         // that side should be a Skystone
         if (!left) location = Location.LEFT;
         else if (!right) location = Location.RIGHT;
-        else location = Location.NONE;
+        else location = Location.NOT_FOUND;
 
         // record statistics as the algorithm can become unstable
         updateStatistics();
@@ -109,7 +109,7 @@ public class SkystoneOpenCVDetector extends SkystoneDetectorBase {
         switch (maxIdx) {
             case 0: return Location.LEFT;
             case 1: return Location.RIGHT;
-            default: return Location.NONE;
+            default: return Location.NOT_FOUND;
         }
     }
 
@@ -129,7 +129,7 @@ public class SkystoneOpenCVDetector extends SkystoneDetectorBase {
             case RIGHT:
                 stats[1]++;
                 break;
-            case NONE:
+            case NOT_FOUND:
                 stats[2]++;
         }
     }

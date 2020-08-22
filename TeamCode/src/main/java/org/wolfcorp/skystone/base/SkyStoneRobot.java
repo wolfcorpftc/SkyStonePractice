@@ -14,7 +14,6 @@ public class SkyStoneRobot
     public DcMotor  leftBack     = null;
     public DcMotor  rightBack     = null;
     public DcMotor  lift        = null;
-    public DcMotor  parking = null;
 
     public Servo    leftServo     = null;
     public Servo    rightServo    = null;
@@ -43,7 +42,6 @@ public class SkyStoneRobot
         rightBack  = hwMap.get(DcMotor.class, "rightBack");
 
         lift       = hwMap.get(DcMotor.class, "lift");
-        parking    = hwMap.get(DcMotor.class, "parking");
 
         leftServo  = hwMap.get(Servo.class, "leftServo");
         rightServo = hwMap.get(Servo.class, "rightServo");
@@ -57,19 +55,15 @@ public class SkyStoneRobot
         leftBack.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
         rightBack.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
         lift.setDirection(DcMotor.Direction.FORWARD);
-        parking.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
         setDrivePower(0);
         lift.setPower(0);
-        parking.setPower(0);
 
         // Configure motors
         setDriveRunMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        parking.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        parking.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         capstone.setPosition(0.5);
     }
 
